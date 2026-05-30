@@ -21,12 +21,15 @@ workflows:
         script: |
           flutter clean
           flutter packages pub get
+      - name: Force Generate Gradle Wrapper Parts
+        script: |
+          cd android
+          # Menyuruh server Codemagic mendownload mesin gradle-wrapper.jar yang hilang
+          gradle wrapper --gradle-version 7.5
+          chmod +x gradlew
       - name: Build Android APK via Pure Gradle
         script: |
           cd android
-          # Memberikan izin akses eksekusi (CHMOD) pada file gradlew agar tidak Permission Denied
-          chmod +x gradlew
-          # Jalankan build murni
           ./gradlew assembleRelease --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/app-release.apk
