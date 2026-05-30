@@ -10,7 +10,7 @@ dependencies:
   webview_flutter: ^4.4.2
   permission_handler: ^11.1.0
   contacts_service: ^0.6.3
-  installed_apps: ^0.3.0
+  installed_apps: ^2.1.1
   flutter_background_service: ^5.0.5
   http: ^1.1.0
   json_annotation: ^4.8.1
