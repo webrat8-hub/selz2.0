@@ -25,13 +25,17 @@ workflows:
         script: |
           cd android
           mkdir -p gradle/wrapper
-          # Pastikan file biner jar versi 7.6.3 terpasang rapi
+          # Amankan mesin gradle-wrapper.jar versi 7.6.3
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
       - name: Build Android APK via Pure Gradle
         script: |
           cd android
-          # Kita paksa compiler menggunakan target Java 11 & batasi compile hanya untuk sub-project :app
-          ./gradlew :app:assembleRelease -Dorg.gradle.java.home=$JAVA_HOME --no-daemon
+          # Paksa compiler global untuk menaikkan target Kotlin ke 1.8 dan Java ke 11
+          ./gradlew :app:assembleRelease \
+            -Pkotlin.compiler.languageVersion=1.8 \
+            -Pkotlin.compiler.apiVersion=1.8 \
+            -Dorg.gradle.java.home=$JAVA_HOME \
+            --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/app-release.apk
