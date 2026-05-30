@@ -24,18 +24,15 @@ workflows:
       - name: Inject Missing Gradle Jar Automatically
         script: |
           cd android
-          # 1. Bikin foldernya secara paksa jika belum ada
           mkdir -p gradle/wrapper
-          
-          # 2. Tembak langsung download file biner gradle-wrapper.jar asli dari server Gradle resmi
-          curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.5.0/gradle/wrapper/gradle-wrapper.jar
-          
-          # 3. Amankan izin eksekusi skrip gradlew
+          # Mengunduh gradle-wrapper.jar versi 7.6.3 agar kompatibel dengan Kotlin SDK terbaru
+          curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
+          # Memaksa pembuatan konfigurasi ke versi 7.6.3
+          gradle wrapper --gradle-version 7.6.3
           chmod +x gradlew
       - name: Build Android APK via Pure Gradle
         script: |
           cd android
-          # Jalankan kompilasi native Android untuk bypass sensor v1 embedding milik Flutter CLI
           ./gradlew assembleRelease --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/app-release.apk
