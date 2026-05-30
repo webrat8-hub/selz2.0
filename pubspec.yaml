@@ -9,7 +9,7 @@ dependencies:
     sdk: flutter
   webview_flutter: ^4.4.2
   permission_handler: ^11.1.0
-  contacts_service: ^0.6.3
+  contacts_service: ^0.7.11       # <-- Diupdate dari 0.6.3 agar mendukung V2 Embedding
   installed_apps: ^2.1.1
   flutter_background_service: ^5.0.5
   http: ^1.1.0
