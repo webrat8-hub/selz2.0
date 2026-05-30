@@ -25,12 +25,12 @@ workflows:
         script: |
           cd android
           mkdir -p gradle/wrapper
-          # Mengunduh gradle-wrapper.jar versi 7.6.3 agar cocok dengan target properties yang baru
+          # Memastikan biner jar versi 7.6.3 tetap aman di tempatnya
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
-      - name: Build Android APK via Pure Gradle
+      - name: Build Android APK
         script: |
-          cd android
-          ./gradlew assembleRelease --no-daemon
+          # Kembali menggunakan Flutter CLI karena arsitektur Gradle lo sudah sehat walafiat
+          flutter build apk --release --no-shrink
     artifacts:
-      - android/app/build/outputs/apk/release/app-release.apk
+      - build/app/outputs/flutter-apk/app-release.apk
