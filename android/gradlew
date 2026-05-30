@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+# Die on error
+set -e
+
+# Extract launch dir
+APP_PATH="$0"
+while [ -h "$APP_PATH" ]; do
+    APP_PATH=$(readlink "$APP_PATH")
+done
+APP_HOME=$(cd "$(dirname "$APP_PATH")" && pwd -P)
+
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+# Determine the Java command to use
+if [ -n "$JAVA_HOME" ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+else
+    JAVACMD="java"
+fi
+
+exec "$JAVACMD" "-Xmx64m" "-Xms64m" "-Dorg.gradle.appname=gradlew" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
