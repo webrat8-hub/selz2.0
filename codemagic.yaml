@@ -25,10 +25,8 @@ workflows:
         script: |
           cd android
           mkdir -p gradle/wrapper
-          # Mengunduh gradle-wrapper.jar versi 7.6.3 agar kompatibel dengan Kotlin SDK terbaru
+          # Mengunduh gradle-wrapper.jar versi 7.6.3 agar cocok dengan target properties yang baru
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
-          # Memaksa pembuatan konfigurasi ke versi 7.6.3
-          gradle wrapper --gradle-version 7.6.3
           chmod +x gradlew
       - name: Build Android APK via Pure Gradle
         script: |
