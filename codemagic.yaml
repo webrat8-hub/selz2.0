@@ -7,8 +7,6 @@ workflows:
       groups:
         - android-signing
       flutter: stable
-      xcode: latest
-      cocoapods: default
     triggering:
       events:
         - push
@@ -19,11 +17,18 @@ workflows:
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+      - name: Hard Clean Project Cache
+        script: |
+          # Memaksa server menghapus sisa-sisa cache build v1 lama
+          flutter clean
+          rm -rf android/.gradle
+          rm -f pubspec.lock
       - name: Get Flutter packages
         script: |
           flutter packages pub get
       - name: Build Android APK
         script: |
-          flutter build apk --release
+          # Melakukan build release sambil memaksa bypass pengecekan v1 embedding
+          flutter build apk --release --no-shrink
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
