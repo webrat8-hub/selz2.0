@@ -13,7 +13,6 @@ workflows:
       branch_patterns:
         - pattern: 'main'
           include: true
-        
    scripts:
       - name: Set up local.properties
         script: |
