@@ -1,0 +1,19 @@
+name: selz_monitor
+description: "Super Monitor APK"
+version: 1.0.0+1
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.4.2
+  permission_handler: ^11.1.0
+  contacts_service: ^0.6.3
+  installed_apps: ^0.3.0
+  flutter_background_service: ^5.0.5
+  http: ^1.1.0
+  json_annotation: ^4.8.1
+
+flutter:
+  uses-material-design: true
