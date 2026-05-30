@@ -9,7 +9,7 @@ dependencies:
     sdk: flutter
   webview_flutter: ^4.4.2
   permission_handler: ^11.1.0
-  contacts_service: ^0.7.10       # <-- Menggunakan versi stabil v2 embedding yang cocok untuk Dart 3
+  flutter_contacts: ^1.1.9
   installed_apps: ^2.1.1
   flutter_background_service: ^5.0.5
   http: ^1.1.0
