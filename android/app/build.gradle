@@ -1,6 +1,7 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    // Menggunakan plugin kotlin terbaru yang kompatibel dengan V2 embedding
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -57,9 +58,9 @@ android {
 }
 
 flutter {
-    source rootProject.file('../')
+    source rootProject.file('..')
 }
 
 dependencies {
-    // Sengaja dikosongkan karena Flutter versi baru otomatis handle stdlib lewat plugin luar
+    // Dependensi diurus otomatis oleh Flutter global plugin
 }
