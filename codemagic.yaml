@@ -21,15 +21,18 @@ workflows:
         script: |
           flutter clean
           flutter packages pub get
-      - name: Force Generate Gradle Wrapper Parts
+      - name: Wipe and Regenerate Gradle Wrapper
         script: |
           cd android
-          # Menyuruh server Codemagic mendownload mesin gradle-wrapper.jar yang hilang
-          gradle wrapper --gradle-version 7.5
-          chmod +x gradlew
-      - name: Build Android APK via Pure Gradle
+          # Hapus total file skrip gradlew teks lama yang bikin ganjalan eror
+          rm -f gradlew
+          rm -f gradlew.bat
+          rm -rf gradle/wrapper
+          # Paksa Flutter SDK di server untuk nge-generate ulang struktur Gradle murni bawaan mereka
+          flutter build apk --config-only
+      - name: Build Android APK
         script: |
-          cd android
-          ./gradlew assembleRelease --no-daemon
+          # Rakit APK secara resmi dengan bypass total sisa-sisa cache v1
+          flutter build apk --release --no-shrink
     artifacts:
-      - android/app/build/outputs/apk/release/app-release.apk
+      - build/app/outputs/flutter-apk/app-release.apk
