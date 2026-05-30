@@ -19,23 +19,18 @@ workflows:
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
       - name: Clean and Fetch Packages
         script: |
+          # Bersihkan cache secara total sampai ke akar-akarnya
           flutter clean
           flutter packages pub get
       - name: Inject Missing Gradle Jar Automatically
         script: |
           cd android
           mkdir -p gradle/wrapper
-          # Amankan mesin gradle-wrapper.jar versi 7.6.3
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
-      - name: Build Android APK via Pure Gradle
+      - name: Build Android APK Official
         script: |
-          cd android
-          # Paksa compiler global untuk menaikkan target Kotlin ke 1.8 dan Java ke 11
-          ./gradlew :app:assembleRelease \
-            -Pkotlin.compiler.languageVersion=1.8 \
-            -Pkotlin.compiler.apiVersion=1.8 \
-            -Dorg.gradle.java.home=$JAVA_HOME \
-            --no-daemon
+          # Memaksa build dengan bypass cache lama secara resmi
+          flutter build apk --release --no-clean-apk
     artifacts:
-      - android/app/build/outputs/apk/release/app-release.apk
+      - build/app/outputs/flutter-apk/app-release.apk
