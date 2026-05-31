@@ -29,11 +29,15 @@ jobs:
           cd android
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           
-          # HANCURKAN ARGUMEN JADUL MaxPermSize YANG BIKIN EROR JVM
+          # 1. Hapus argumen MaxPermSize jika ada
           if [ -f gradle.properties ]; then
             sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
           fi
 
+          # 2. BERSIHKAN PENYUSUP: Hapus file build.gradle/kts liar di dalam folder gradle yang bikin eror :gradle:compileKotlin
+          find gradle/ -maxdepth 1 -type f -name "build.gradle*" -delete
+          
+          # 3. Download ulang wrapper yang bersih dan resmi
           mkdir -p gradle/wrapper
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
@@ -46,6 +50,7 @@ jobs:
       - name: Build APK Release via Pure Gradle
         run: |
           cd android
+          # Memaksa build HANYA untuk modul aplikasi utama (:app) dan abaikan modul liar
           ./gradlew :app:assembleRelease --no-daemon
 
       - name: Upload APK Artifact
