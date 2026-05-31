@@ -1,4 +1,14 @@
 pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def sdkPath = properties.getProperty("flutter.sdk")
+        assert sdkPath != null, "flutter.sdk not set in local.properties"
+        return sdkPath
+    }()
+
+    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
     repositories {
         google()
         mavenCentral()
@@ -6,14 +16,15 @@ pluginManagement {
     }
 }
 
+plugins {
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 dependencyResolutionManagement {
-    // Kita hapus/komen baris ini biar dia mau baca repositori dari build.gradle
-    // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
 }
 
-rootProject.name = "android"
 include ':app'
