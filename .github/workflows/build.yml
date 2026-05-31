@@ -31,8 +31,9 @@ jobs:
           flutter clean
           flutter pub get
           
-          # 3. Build dengan mode release tanpa daemon (lebih stabil di CI)
-          flutter build apk --release --no-daemon
+          # 3. Build standar tanpa opsi aneh-aneh
+          flutter build apk --release
+
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
