@@ -26,28 +26,35 @@ jobs:
 
       - name: Fix Permissions and Setup Properties
         run: |
+          # 1. Bantai settings.gradle LIAR yang ada di luar folder android (Root)
+          if [ -f settings.gradle ]; then
+            rm -f settings.gradle
+          fi
+          if [ -f settings.gradle.kts ]; then
+            rm -f settings.gradle.kts
+          fi
+
           cd android
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           
-          # 1. Hapus argumen MaxPermSize jadul
+          # 2. Hapus argumen MaxPermSize di properti android
           if [ -f gradle.properties ]; then
             sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
           fi
 
-          # 2. POTONG JALUR SI KEPARAT :gradle DI SETTINGS.GRADLE
+          # 3. Potong jalur modul :gradle di file android/settings.gradle yang asli
           if [ -f settings.gradle ]; then
             sed -i "/include ':gradle'/d" settings.gradle
             sed -i "/include 'gradle'/d" settings.gradle
           fi
 
-          # 3. NUKLIR TOTAL: Hapus folder gradle lama beserta hantu file build didalamnya
+          # 4. Hapus total folder gradle lama di dalam android/
           rm -rf gradle
 
-          # 4. Bangun ulang folder wrapper yang 100% steril dan bersih
+          # 5. Bangun ulang folder wrapper resmi dari nol
           mkdir -p gradle/wrapper
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           
-          # Buat ulang file gradle-wrapper.properties standar biar gak nyari konfigurasi aneh
           echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
           echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
@@ -64,6 +71,7 @@ jobs:
       - name: Build APK Release via Pure Gradle
         run: |
           cd android
+          # Pindah eksekusi langsung pake perintah spesifik modul app
           ./gradlew :app:assembleRelease --no-daemon
 
       - name: Upload APK Artifact
