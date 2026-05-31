@@ -4,24 +4,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 android {
     namespace "com.example.selz_monitor"
     compileSdkVersion 34
@@ -43,8 +25,9 @@ android {
         applicationId "com.example.selz_monitor"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        // Kita hardcode version-nya biar gak nyari file lokal dan gak bikin 'null'
+        versionCode 1
+        versionName "1.0"
     }
 
     buildTypes {
@@ -58,4 +41,10 @@ android {
 
 flutter {
     source rootProject.file('..')
+}
+
+dependencies {
+    // KOSONGKAN BLOK INI! 
+    // Di Flutter versi terbaru, semua plugin dan library Kotlin otomatis disuntik ke sini.
+    // Gak boleh ada kode $kotlin_version lagi yang bikin sistem crash jadi 'null'.
 }
