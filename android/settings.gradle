@@ -14,22 +14,8 @@ pluginManagement {
     }
 }
 
+plugins {
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 include ':app'
-
-// Manual registration for plugins
-def pubCache = "/home/runner/.pub-cache/hosted/pub.dev"
-
-include ':flutter_background_service_android'
-project(':flutter_background_service_android').projectDir = new File(pubCache, 'flutter_background_service_android-6.3.1/android')
-
-include ':permission_handler_android'
-project(':permission_handler_android').projectDir = new File(pubCache, 'permission_handler_android-12.0.13/android')
-
-include ':webview_flutter_android'
-project(':webview_flutter_android').projectDir = new File(pubCache, 'webview_flutter_android-3.16.3/android')
-
-include ':installed_apps'
-project(':installed_apps').projectDir = new File(pubCache, 'installed_apps-2.1.1/android')
-
-include ':flutter_contacts'
-project(':flutter_contacts').projectDir = new File(pubCache, 'flutter_contacts-1.1.9+2/android')
