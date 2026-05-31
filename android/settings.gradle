@@ -16,10 +16,6 @@ pluginManagement {
     }
 }
 
-plugins {
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
 dependencyResolutionManagement {
     repositories {
         google()
@@ -27,4 +23,5 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "android"
 include ':app'
