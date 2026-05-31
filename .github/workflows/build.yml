@@ -1,42 +1,25 @@
-name: Build Flutter Android APK
+name: Build APK
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'zulu', java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { flutter-version: '3.19.6' }
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.6'
-
-      - name: Build APK
+      - name: Build
         run: |
-          # 1. Pastikan path SDK tersambung
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          
-          # 2. Bersihkan total untuk menghindari konflik cache
           flutter clean
           flutter pub get
-          
-          # 3. Build standar tanpa opsi aneh-aneh
           flutter build apk --release
 
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: selz-monitor-apk
+          name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
