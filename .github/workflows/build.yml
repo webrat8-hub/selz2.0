@@ -24,47 +24,70 @@ jobs:
         with:
           flutter-version: '3.19.6'
 
-      - name: Ultimate Auto Migrate to Embedding V2 via Regex Python
+      - name: Create and Run Ultimate V2 Migrator
         run: |
-          python3 -c "
-          import os, re
+          # Menggunakan 'EOF' biar semua tanda kutip di dalam kode Python aman 100%
+          cat << 'EOF' > migrator.py
+          import os
+          import re
 
-          # 1. Scan dan Paksa Ubah Semua AndroidManifest.xml ke V2
+          print("=== MEMULAI SCRIPT MIGRASI V2 EMBEDDING ===")
+
+          # 1. Sikat semua AndroidManifest.xml di dalam repo
+          manifest_found = False
           for root, dirs, files in os.walk('.'):
               for file in files:
-                  if file == 'AndroidManifest.xml' and 'profile' not in root and 'debug' not in root:
+                  if file == 'AndroidManifest.xml':
                       path = os.path.join(root, file)
-                      print(f'Membedah Manifest: {path}')
-                      with open(path, 'r') as f:
+                      print(f"Menemukan file Manifest: {path}")
+                      manifest_found = True
+                      
+                      with open(path, 'r', encoding='utf-8', errors='ignore') as f:
                           content = f.read()
                       
-                      # Hapus total nama application V1 jadul jika ada
-                      content = content.replace('io.flutter.app.FlutterApplication', '\${applicationName}')
+                      # Hapus tag embedding lama/rusak biar gak duplikat
+                      content = re.sub(r'<meta-data\s+android:name=["\']flutterEmbedding["\'][^>]*>', '', content)
                       
-                      # Suntik Meta-data V2 menggunakan Regex anti-gagal (kebal spasi / baris baru)
-                      if 'flutterEmbedding' not in content:
-                          content = re.sub(r'(?i)</application\s*>', '        <meta-data android:name=\"flutterEmbedding\" android:value=\"2\" />\n    </application>', content)
-                          print(f'-> BERHASIL SUNTIK V2 EMBEDDING KE: {path}')
+                      # Ganti nama aplikasi V1 purba
+                      content = content.replace('io.flutter.app.FlutterApplication', '${applicationName}')
                       
-                      with open(path, 'w') as f:
+                      # Suntik paksa tag V2 tepat sebelum tag penutup </application>
+                      content = re.sub(r'(?i)</application\s*>', '        <meta-data android:name="flutterEmbedding" android:value="2" />\n    </application>', content)
+                      
+                      with open(path, 'w', encoding='utf-8') as f:
                           f.write(content)
+                      print(f"-> BERHASIL MEMAKSA V2 PADA: {path}")
 
-          # 2. Scan dan Paksa Ubah Semua MainActivity (Java / Kotlin) ke V2
+          if not manifest_found:
+              print("PERINGATAN: AndroidManifest.xml sama sekali tidak ditemukan!")
+
+          # 2. Sikat semua MainActivity & Application class (Java / Kotlin)
           for root, dirs, files in os.walk('.'):
               for file in files:
-                  if file in ['MainActivity.kt', 'MainActivity.java']:
+                  if file.endswith('.kt') or file.endswith('.java'):
                       path = os.path.join(root, file)
-                      print(f'Membedah Activity: {path}')
-                      with open(path, 'r') as f:
+                      
+                      with open(path, 'r', encoding='utf-8', errors='ignore') as f:
                           content = f.read()
                       
-                      # Ganti paksa import Activity V1 ke V2 modern
-                      content = content.replace('io.flutter.app.FlutterActivity', 'io.flutter.embedding.android.FlutterActivity')
+                      modified = False
+                      if 'io.flutter.app.FlutterActivity' in content:
+                          content = content.replace('io.flutter.app.FlutterActivity', 'io.flutter.embedding.android.FlutterActivity')
+                          modified = True
+                      if 'io.flutter.app.FlutterApplication' in content:
+                          content = content.replace('io.flutter.app.FlutterApplication', 'android.app.Application')
+                          modified = True
                       
-                      with open(path, 'w') as f:
-                          f.write(content)
-                      print(f'-> BERHASIL MIGRASI ACTIVITY: {path}')
-          "
+                      if modified:
+                          with open(path, 'w', encoding='utf-8') as f:
+                              f.write(content)
+                          print(f"-> BERHASIL MIGRASI KODE SUMBER V2: {path}")
+
+          print("=== SCRIPT MIGRASI SELESAI ===")
+          EOF
+          
+          # Jalankan script mandiri yang udah dibuat
+          python3 migrator.py
 
       - name: Fix Permissions and Setup Properties
         run: |
