@@ -25,14 +25,12 @@ android {
         applicationId "com.example.selz_monitor"
         minSdkVersion 21
         targetSdkVersion 34
-        // Kita hardcode version-nya biar gak nyari file lokal dan gak bikin 'null'
         versionCode 1
         versionName "1.0"
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
         }
@@ -44,7 +42,5 @@ flutter {
 }
 
 dependencies {
-    // KOSONGKAN BLOK INI! 
-    // Di Flutter versi terbaru, semua plugin dan library Kotlin otomatis disuntik ke sini.
-    // Gak boleh ada kode $kotlin_version lagi yang bikin sistem crash jadi 'null'.
+    // Biarkan kosong, plugin akan disuntik otomatis oleh flutter-gradle-plugin
 }
