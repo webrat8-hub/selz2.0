@@ -24,28 +24,51 @@ jobs:
         with:
           flutter-version: '3.19.6'
 
-      - name: Fix Permissions and Auto Migrate to Embedding V2
+      - name: Auto Migrate to Embedding V2 via Python
+        run: |
+          python3 -c "
+          import os
+
+          manifest_path = 'android/app/src/main/AndroidManifest.xml'
+          if os.path.exists(manifest_path):
+              with open(manifest_path, 'r') as f:
+                  content = f.read()
+              
+              # Ganti nama application v1 jadi template v2 yang bener
+              v2_app_name = '\$' + '{applicationName}'
+              content = content.replace('io.flutter.app.FlutterApplication', v2_app_name)
+              
+              # Suntik meta-data v2 tepat sebelum tag penutup application
+              if 'flutterEmbedding' not in content:
+                  content = content.replace('</application>', '        <meta-data android:name=\"flutterEmbedding\" android:value=\"2\" />\n    </application>')
+              
+              with open(manifest_path, 'w') as f:
+                  f.write(content)
+              print('AndroidManifest.xml BERHASIL FORCE KE V2!')
+
+          # Paksa MainActivity (Java / Kotlin) pake import V2
+          base_path = 'android/app/src/main'
+          for root, dirs, files in os.walk(base_path):
+              for file in files:
+                  if file in ['MainActivity.kt', 'MainActivity.java']:
+                      path = os.path.join(root, file)
+                      with open(path, 'r') as f:
+                          code = f.read()
+                      code = code.replace('io.flutter.app.FlutterActivity', 'io.flutter.embedding.android.FlutterActivity')
+                      with open(path, 'w') as f:
+                          f.write(code)
+                      print(f'{file} BERHASIL FORCE KE V2!')
+          "
+
+      - name: Fix Permissions and Setup Properties
         run: |
           cd android
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           
-          # 1. Hapus argumen MaxPermSize jadul biar JVM tenang
           if [ -f gradle.properties ]; then
             sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
           fi
 
-          # 2. SUNTIK OTOMATIS EMBEDDING V2 KE ANDROIDMANIFEST.XML
-          MANIFEST_PATH="app/src/main/AndroidManifest.xml"
-          if [ -f "$MANIFEST_PATH" ]; then
-            if ! grep -q "flutterEmbedding" "$MANIFEST_PATH"; then
-              sed -i '/<application/a \        <meta-data android:name="flutterEmbedding" android:value="2" />' "$MANIFEST_PATH"
-            fi
-          fi
-
-          # 3. PAKSA MIGRASI MAINACTIVITY KE V2 EMBEDDING (KOTLIN / JAVA)
-          find app/src/main/ -type f \( -name "*.kt" -o -name "*.java" \) -exec sed -i 's/io.flutter.app.FlutterActivity/io.flutter.embedding.android.FlutterActivity/g' {} +
-
-          # 4. Inject Gradle Wrapper resmi
           mkdir -p gradle/wrapper
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
