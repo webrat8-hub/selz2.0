@@ -14,19 +14,12 @@ pluginManagement {
     }
 }
 
-plugins {
-    id "dev.flutter.flutter-gradle-plugin"
-}
+// HAPUS blok plugins { id "dev.flutter.flutter-gradle-plugin" } dari sini!
+// Ini penyebab error 'cannot be cast' lo.
 
-// INI KUNCI UTAMANYA: Mengambil semua plugin dari file .flutter-plugins
 include ':app'
 
-def localProperties = new Properties()
-def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
-}
-
+// Auto-register plugin dari .flutter-plugins
 def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 def plugins = new Properties()
 def pluginsFile = new File(rootProject.projectDir, '.flutter-plugins')
