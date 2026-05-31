@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,22 +27,28 @@ jobs:
         with:
           flutter-version: '3.19.6'
 
-      # STRATEGI PINTAS: Hapus semua file *generated* biar Flutter bikin ulang dari awal
-      - name: Force Rebuild Dependencies
+      - name: Fix Local Properties and Build
         run: |
-          # Hapus file sampah yang bikin 'Value is null'
-          rm -rf android/.gradle
-          rm -f android/app/build/
+          # 1. Bersihkan sisa-sisa build lama agar tidak ada path korup
+          rm -f android/local.properties
           rm -f .flutter-plugins .flutter-plugins-dependencies
           
-          # Paksa Flutter buat bikin ulang konfigurasi plugin
-          flutter pub get
+          # 2. Buat ulang local.properties dengan path SDK yang benar dari env
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          
+          # 3. Bersihkan gradle cache biar fresh
+          cd android
+          chmod +x gradlew
+          ./gradlew clean
+          cd ..
+          
+          # 4. Fetch dependencies
           flutter clean
+          flutter pub get
 
       - name: Build APK Release
         run: |
-          # Kita pakai flag --no-shrink biar gak bentrok sama konfigurasi minification
-          flutter build apk --release --no-shrink
+          flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
