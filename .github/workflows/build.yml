@@ -13,50 +13,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 1. SET UP JAVA 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      # 2. SET UP FLUTTER
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
 
-      # 3. SAKLAR SAPU BERSIH (Hapus cache lokal & Suntik SDK Path)
-      - name: Clean Local Junk and Fix Properties
+      # STRATEGI PINTAS: Hapus semua file *generated* biar Flutter bikin ulang dari awal
+      - name: Force Rebuild Dependencies
         run: |
-          # Hapus file konfigurasi bawaan PC/HP yang tidak sengaja ke-commit
+          # Hapus file sampah yang bikin 'Value is null'
+          rm -rf android/.gradle
+          rm -f android/app/build/
           rm -f .flutter-plugins .flutter-plugins-dependencies
-          rm -f android/local.properties
           
-          # Buat ulang local.properties yang bersih khusus untuk server GitHub
-          cd android
-          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
-          
-          # Bersihkan sisa MaxPermSize di gradle.properties jika ada
-          if [ -f gradle.properties ]; then
-            sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
-            sed -i 's/MaxPermSize=512m//g' gradle.properties
-            echo "org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m" >> gradle.properties
-          fi
-
-      # 4. AMBIL DEPENDENCIES FRESH/SEGAR
-      - name: Clean and Fetch Packages
-        run: |
-          flutter clean
+          # Paksa Flutter buat bikin ulang konfigurasi plugin
           flutter pub get
+          flutter clean
 
-      # 5. BUILD APK RELEASE
-      - name: Build APK Release via Flutter CLI
+      - name: Build APK Release
         run: |
-          flutter build apk --release
+          # Kita pakai flag --no-shrink biar gak bentrok sama konfigurasi minification
+          flutter build apk --release --no-shrink
 
-      # 6. UPLOAD HASIL APK
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: selz-monitor-apk
