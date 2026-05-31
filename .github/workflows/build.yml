@@ -13,54 +13,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '11' # Gradle 7.6.3 paling stabil dan bahagia di Java 11
 
-      - name: Set up Flutter SDK
+      - name: Set up Flutter SDK (Downgrade Instan)
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          flutter-version: '3.19.6' # INI KUNCINYA! Biar match sama Gradle 7.6.3 lo dan gak bikin internal crash
 
       - name: Fix Permissions and Setup Properties
         run: |
-          # 1. Bantai settings.gradle LIAR yang ada di luar folder android (Root)
-          if [ -f settings.gradle ]; then
-            rm -f settings.gradle
-          fi
-          if [ -f settings.gradle.kts ]; then
-            rm -f settings.gradle.kts
-          fi
-
           cd android
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           
-          # 2. Hapus argumen MaxPermSize di properti android
           if [ -f gradle.properties ]; then
             sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
           fi
 
-          # 3. Potong jalur modul :gradle di file android/settings.gradle yang asli
-          if [ -f settings.gradle ]; then
-            sed -i "/include ':gradle'/d" settings.gradle
-            sed -i "/include 'gradle'/d" settings.gradle
-          fi
-
-          # 4. Hapus total folder gradle lama di dalam android/
-          rm -rf gradle
-
-          # 5. Bangun ulang folder wrapper resmi dari nol
           mkdir -p gradle/wrapper
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
-          
-          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
-          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
-          echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-7.6.3-all.zip" >> gradle/wrapper/gradle-wrapper.properties
-          
           chmod +x gradlew
 
       - name: Clean and Fetch Packages
@@ -71,7 +45,6 @@ jobs:
       - name: Build APK Release via Pure Gradle
         run: |
           cd android
-          # Pindah eksekusi langsung pake perintah spesifik modul app
           ./gradlew :app:assembleRelease --no-daemon
 
       - name: Upload APK Artifact
