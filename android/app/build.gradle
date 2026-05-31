@@ -17,10 +17,6 @@ android {
         jvmTarget = '17'
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
     defaultConfig {
         applicationId "com.example.selz_monitor"
         minSdkVersion 21
@@ -39,8 +35,4 @@ android {
 
 flutter {
     source rootProject.file('..')
-}
-
-dependencies {
-    // Biarkan kosong, plugin akan disuntik otomatis oleh flutter-gradle-plugin
 }
