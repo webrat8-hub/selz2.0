@@ -14,8 +14,4 @@ pluginManagement {
     }
 }
 
-plugins {
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
 include ':app'
