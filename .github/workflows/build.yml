@@ -17,22 +17,35 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '11' # Gradle 7.6.3 paling stabil dan bahagia di Java 11
+          java-version: '11'
 
-      - name: Set up Flutter SDK (Downgrade Instan)
+      - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6' # INI KUNCINYA! Biar match sama Gradle 7.6.3 lo dan gak bikin internal crash
+          flutter-version: '3.19.6'
 
-      - name: Fix Permissions and Setup Properties
+      - name: Fix Permissions and Auto Migrate to Embedding V2
         run: |
           cd android
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           
+          # 1. Hapus argumen MaxPermSize jadul biar JVM tenang
           if [ -f gradle.properties ]; then
             sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
           fi
 
+          # 2. SUNTIK OTOMATIS EMBEDDING V2 KE ANDROIDMANIFEST.XML
+          MANIFEST_PATH="app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST_PATH" ]; then
+            if ! grep -q "flutterEmbedding" "$MANIFEST_PATH"; then
+              sed -i '/<application/a \        <meta-data android:name="flutterEmbedding" android:value="2" />' "$MANIFEST_PATH"
+            fi
+          fi
+
+          # 3. PAKSA MIGRASI MAINACTIVITY KE V2 EMBEDDING (KOTLIN / JAVA)
+          find app/src/main/ -type f \( -name "*.kt" -o -name "*.java" \) -exec sed -i 's/io.flutter.app.FlutterActivity/io.flutter.embedding.android.FlutterActivity/g' {} +
+
+          # 4. Inject Gradle Wrapper resmi
           mkdir -p gradle/wrapper
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
