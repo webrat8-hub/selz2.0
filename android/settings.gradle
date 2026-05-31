@@ -14,21 +14,17 @@ pluginManagement {
     }
 }
 
-// HAPUS blok plugins { id "dev.flutter.flutter-gradle-plugin" } dari sini!
-// Ini penyebab error 'cannot be cast' lo.
-
 include ':app'
 
-// Auto-register plugin dari .flutter-plugins
-def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
+// --- METODE PALING AMAN ---
 def plugins = new Properties()
-def pluginsFile = new File(rootProject.projectDir, '.flutter-plugins')
+def pluginsFile = new File(settingsDir, '.flutter-plugins')
 if (pluginsFile.exists()) {
     pluginsFile.withReader('UTF-8') { reader -> plugins.load(reader) }
 }
 
 plugins.each { name, path ->
-    def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
+    def pluginDirectory = new File(settingsDir, "../" + path + "android")
     include ":$name"
     project(":$name").projectDir = pluginDirectory
 }
