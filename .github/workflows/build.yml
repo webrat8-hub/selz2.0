@@ -11,7 +11,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -27,21 +26,21 @@ jobs:
         with:
           flutter-version: '3.19.6'
 
-      - name: Prepare Build
+      - name: Prepare and Build
         run: |
-          # Hapus file yang sering bikin konflik
+          # 1. Hapus sisa file lama
+          rm -f android/local.properties
           rm -f .flutter-plugins .flutter-plugins-dependencies
           
-          # Buat local.properties (PENTING)
+          # 2. Buat config path SDK
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
           
-          # Bersihkan project dengan Flutter CLI, bukan gradlew
+          # 3. Bersihkan gradle cache biar gak korup
+          rm -rf ~/.gradle/caches
+          
+          # 4. Build
           flutter clean
           flutter pub get
-
-      - name: Build APK Release
-        run: |
-          # Langsung hajar build pakai flutter CLI
           flutter build apk --release
 
       - name: Upload APK
