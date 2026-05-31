@@ -26,19 +26,18 @@ jobs:
         with:
           flutter-version: '3.19.6'
 
-      - name: Prepare and Build
+      - name: Prepare Local Properties
         run: |
-          # 1. Bersihkan sisa-sisa path lokal
-          rm -f android/local.properties
-          
-          # 2. Buat konfigurasi SDK agar Gradle tahu lokasi Flutter
+          # Memastikan file local.properties mengandung path ke SDK Flutter
+          # Ini adalah syarat mutlak agar settings.gradle bisa menemukan plugin Flutter
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          
-          # 3. Bersihkan cache agar tidak ada konflik dependensi lama
+
+      - name: Build APK
+        run: |
+          # Membersihkan cache build agar fresh
           flutter clean
           flutter pub get
-          
-          # 4. Jalankan perintah build APK
+          # Menjalankan build apk
           flutter build apk --release
 
       - name: Upload APK Result
