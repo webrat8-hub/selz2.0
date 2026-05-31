@@ -28,6 +28,12 @@ jobs:
         run: |
           cd android
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          
+          # HANCURKAN ARGUMEN JADUL MaxPermSize YANG BIKIN EROR JVM
+          if [ -f gradle.properties ]; then
+            sed -i 's/-XX:MaxPermSize=512m//g' gradle.properties
+          fi
+
           mkdir -p gradle/wrapper
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
