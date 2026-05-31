@@ -8,14 +8,25 @@ android {
     namespace "com.example.selz_monitor"
     compileSdkVersion 34
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
     defaultConfig {
         applicationId "com.example.selz_monitor"
         minSdkVersion 21
         targetSdkVersion 34
-        // Hardcode ini biar nggak ada error 'Value is null'
         versionCode 1
         versionName "1.0"
     }
-    
-    // ... sisa kodenya biarin aja ...
+}
+
+// WAJIB ADA DI PALING BAWAH
+flutter {
+    source '../..'
 }
