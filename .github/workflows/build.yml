@@ -9,29 +9,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Set up Flutter SDK
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
 
-      - name: Prepare Build
+      - name: Build APK
         run: |
-          # Buat local.properties agar flutter-gradle-plugin bisa nemu SDK
+          # 1. Pastikan path SDK tersambung
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
           
-          # Bersihkan dan Build
+          # 2. Bersihkan total untuk menghindari konflik cache
           flutter clean
           flutter pub get
-          flutter build apk --release
+          
+          # 3. Build dengan mode release tanpa daemon (lebih stabil di CI)
+          flutter build apk --release --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
