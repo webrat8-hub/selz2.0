@@ -28,22 +28,20 @@ jobs:
 
       - name: Prepare and Build
         run: |
-          # 1. Hapus sisa file lama
+          # 1. Bersihkan sisa-sisa path lokal
           rm -f android/local.properties
-          rm -f .flutter-plugins .flutter-plugins-dependencies
           
-          # 2. Buat config path SDK
+          # 2. Buat konfigurasi SDK agar Gradle tahu lokasi Flutter
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
           
-          # 3. Bersihkan gradle cache biar gak korup
-          rm -rf ~/.gradle/caches
-          
-          # 4. Build
+          # 3. Bersihkan cache agar tidak ada konflik dependensi lama
           flutter clean
           flutter pub get
+          
+          # 4. Jalankan perintah build APK
           flutter build apk --release
 
-      - name: Upload APK
+      - name: Upload APK Result
         uses: actions/upload-artifact@v4
         with:
           name: selz-monitor-apk
