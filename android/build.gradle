@@ -1,10 +1,8 @@
 buildscript {
     ext.kotlin_version = '1.8.22'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
+    
+    // HAPUS bagian repositories di sini, karena sudah di-handle di settings.gradle
+    
     dependencies {
         // Upgrade plugin gradle ke versi yang cocok dengan Gradle 7.6.3
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -12,12 +10,7 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// HAPUS juga bagian allprojects { repositories { ... } } di bawah ini
 
 rootProject.buildDir = '../build'
 subprojects {
