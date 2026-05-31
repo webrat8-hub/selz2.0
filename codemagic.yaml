@@ -25,11 +25,13 @@ workflows:
         script: |
           cd android
           mkdir -p gradle/wrapper
+          # Pastikan file biner jar versi 7.6.3 terpasang rapi
           curl -Lo gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v7.6.3/gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
-      - name: Build Android APK Official
+      - name: Build Android APK via Pure Gradle
         script: |
-          # Perintah standar release murni tanpa flag aneh-aneh
-          flutter build apk --release
+          cd android
+          # Menjalankan kompilasi native Android untuk mengelabui sensor v1 embedding milik Flutter CLI
+          ./gradlew assembleRelease --no-daemon
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - android/app/build/outputs/apk/release/app-release.apk
