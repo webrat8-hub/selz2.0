@@ -27,27 +27,21 @@ jobs:
         with:
           flutter-version: '3.19.6'
 
-      - name: Fix Local Properties and Build
+      - name: Prepare Build
         run: |
-          # 1. Bersihkan sisa-sisa build lama agar tidak ada path korup
-          rm -f android/local.properties
+          # Hapus file yang sering bikin konflik
           rm -f .flutter-plugins .flutter-plugins-dependencies
           
-          # 2. Buat ulang local.properties dengan path SDK yang benar dari env
+          # Buat local.properties (PENTING)
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
           
-          # 3. Bersihkan gradle cache biar fresh
-          cd android
-          chmod +x gradlew
-          ./gradlew clean
-          cd ..
-          
-          # 4. Fetch dependencies
+          # Bersihkan project dengan Flutter CLI, bukan gradlew
           flutter clean
           flutter pub get
 
       - name: Build APK Release
         run: |
+          # Langsung hajar build pakai flutter CLI
           flutter build apk --release
 
       - name: Upload APK
