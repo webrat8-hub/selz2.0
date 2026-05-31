@@ -1,7 +1,6 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
 }
 
 android {
@@ -29,4 +28,9 @@ android {
 // WAJIB ADA DI PALING BAWAH
 flutter {
     source '../..'
+}
+
+dependencies {
+    // Tambahkan ini biar semua library Flutter terdeteksi dengan benar
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
