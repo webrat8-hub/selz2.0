@@ -19,7 +19,6 @@ workflows:
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
       - name: Clean and Fetch Packages
         script: |
-          # Bersihkan cache secara total sampai ke akar-akarnya
           flutter clean
           flutter packages pub get
       - name: Inject Missing Gradle Jar Automatically
@@ -30,7 +29,7 @@ workflows:
           chmod +x gradlew
       - name: Build Android APK Official
         script: |
-          # Memaksa build dengan bypass cache lama secara resmi
-          flutter build apk --release --no-clean-apk
+          # Perintah standar release murni tanpa flag aneh-aneh
+          flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
